@@ -6,7 +6,7 @@ var categoeryModel = require("../models/category");
 router.get("/getCategories", async function name(req, res) {
   try {
     let data = await categoeryModel.find();
-    res.json(data);
+    res.status(200).json({ status: true, data });
   } catch (error) {
     res.status(400).json({ status: false, message: error.message || "error" });
   }
