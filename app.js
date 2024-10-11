@@ -4,7 +4,7 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 
-//monggose
+// mongoose
 const mongoose = require("mongoose");
 require("./models/user");
 require("./models/category");
@@ -12,6 +12,10 @@ require("./models/product");
 require("./models/orderDetail");
 require("./models/order");
 require("./models/payment");
+
+// axios và node-cron
+const axios = require("axios");
+const cron = require("node-cron");
 
 // router
 var userRouter = require("./routes/user");
@@ -33,16 +37,28 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-//connect database
+// connect database
 mongoose
-
   .connect(
     "mongodb+srv://phongnh10:G3JPLpKxkWLJrudJ@api-phongnh10.cla57.mongodb.net/md19201"
   )
   .then(() => console.log(">>>>>>>>>> DB Connected!!!!!!"))
   .catch((err) => console.log(">>>>>>>>> DB Error: ", err));
 
-//http://localhost:3000
+// Tạo cron job mỗi 10 phút
+cron.schedule("*/10 * * * *", async () => {
+  try {
+    // Gọi đến một endpoint của server
+    await axios.get(
+      "https://api-coffeeshop.onrender.com/category/getCategories"
+    ); // Thay đổi đường dẫn endpoint phù hợp
+    console.log("Server đã được gọi thành công!");
+  } catch (error) {
+    console.error("Có lỗi xảy ra khi gọi server:", error.message);
+  }
+});
+
+// http://localhost:3000
 app.use("/user", userRouter);
 app.use("/product", productRouter);
 app.use("/category", categoryRouter);
