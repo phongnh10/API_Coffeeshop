@@ -24,8 +24,7 @@ router.get("/getProducts", async function (req, res) {
 router.get("/getProductByIdCategory/:idCategory", async function (req, res) {
   try {
     const { idCategory } = req.params;
-
-    const data = await productModel.find({ _id: idCategory });
+    const data = await productModel.find({ category: idCategory });
     if (!data || data.length === 0) {
       return res.status(400).json({ status: false, message: "Thất Bại" });
     }
