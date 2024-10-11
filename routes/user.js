@@ -1,22 +1,28 @@
 var express = require("express");
 var router = express.Router();
 const userModel = require("../models/user");
+const mongoose = require("mongoose");
 
 // Register
 router.post("/register", async function (req, res) {
   try {
     const { email, password, name } = req.body;
+
+    // Kiểm tra xem người dùng đã tồn tại chưa
     const user = await userModel.findOne({ email });
     if (user) {
       return res
         .status(400)
-        .json({ Status: false, Message: "Tài khoản đã tồn tại" });
-    } else {
-      addUser = await userModel.create({ email, password, name });
-      res.status(200).json({ Status: true, Message: "Đăng ký thành công" });
+        .json({ status: false, message: "Tài khoản đã tồn tại" });
     }
+
+    await userModel.create({ email, password, name });
+    res.status(200).json({ status: true, message: "Đăng ký thành công" });
   } catch (error) {
-    res.status(400).json({ Status: false, Message: error.Message || "error" });
+    console.error("Error during registration:", error);
+    res
+      .status(500)
+      .json({ status: false, message: "Có lỗi xảy ra", error: error.message });
   }
 });
 
@@ -28,12 +34,12 @@ router.post("/login", async function (req, res) {
     if (!user || user.password !== password) {
       return res
         .status(400)
-        .json({ Status: false, Message: "Sai tài khoản hoặc mật khẩu" });
+        .json({ status: false, message: "Sai tài khoản hoặc mật khẩu" });
     } else {
-      res.status(200).json({ Status: true, Message: "Đăng nhập thành công" });
+      res.status(200).json({ status: true, message: "Đăng nhập thành công" });
     }
   } catch (e) {
-    res.status(400).json({ Status: false, Message: "error" });
+    res.status(400).json({ status: false, message: "error" });
   }
 });
 //ForgotPassword
