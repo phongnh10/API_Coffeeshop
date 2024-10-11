@@ -4,6 +4,7 @@ let productModel = require("../models/product");
 let upload = require("../utils/configMulter");
 let sendMail = require("../utils/configMail");
 const { model } = require("mongoose");
+const mongoose = require("mongoose");
 
 //  - Lấy toàn bộ danh sách sản phẩm
 router.get("/getProducts", async function (req, res) {
@@ -13,10 +14,10 @@ router.get("/getProducts", async function (req, res) {
       res.status(400).json({ status: false, message: "Thất Bại" });
       return;
     } else {
-      res.json(data);
+      res.status(true).json(data);
     }
   } catch (error) {
-    res.status(400).json({ status: false, message: "error" });
+    res.status(500).json({ status: false, message: "error" });
   }
 });
 
@@ -24,16 +25,29 @@ router.get("/getProducts", async function (req, res) {
 router.get("/getProductByIdCategory/:idCategory", async function (req, res) {
   try {
     const { idCategory } = req.params;
-    const data = await productModel.find({ category: idCategory });
-    if (!data || data.length === 0) {
-      return res.status(400).json({ status: false, message: "Thất Bại" });
+
+    // Chuyển đổi idCategory thành ObjectId
+    const categoryId = mongoose.Types.ObjectId(idCategory);
+
+    // Tìm kiếm sản phẩm theo category
+    const products = await productModel.find({ category: categoryId });
+
+    // Kiểm tra nếu không có sản phẩm nào được tìm thấy
+    if (!products || products.length === 0) {
+      return res
+        .status(404)
+        .json({ status: false, message: "Không tìm thấy sản phẩm nào." });
     }
-    res.json(data);
+
+    // Trả về danh sách sản phẩm
+    res.json({ status: true, data: products });
   } catch (error) {
-    res.status(400).json({ status: false, message: "error" });
+    console.error(error); // In ra lỗi để dễ dàng debug
+    res
+      .status(500)
+      .json({ status: false, message: "Có lỗi xảy ra", error: error.message });
   }
 });
-
 // add product
 router.post("/addProduct", async function (req, res) {
   try {
@@ -79,7 +93,7 @@ router.post("/addProduct", async function (req, res) {
         .json({ Status: true, Message: "Thêm sản phẩm thành công" });
     }
   } catch (error) {
-    res.status(400).json({ Status: false, Message: "error" });
+    res.status(500).json({ Status: false, Message: "error" });
   }
 
   // deleta product
@@ -98,7 +112,7 @@ router.post("/addProduct", async function (req, res) {
           .json({ status: false, message: "Không tìm thấy sản phẩm" });
       }
     } catch (error) {
-      res.status(400).json({ status: false, message: "error" });
+      res.status(500).json({ status: false, message: "error" });
     }
   });
 });

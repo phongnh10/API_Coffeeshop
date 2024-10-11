@@ -4,6 +4,7 @@ const orderDetailModel = require("../models/orderDetail");
 const productModel = require("../models/product");
 const userModel = require("../models/user");
 const orderModel = require("../models/order");
+const mongoose = require("mongoose");
 
 // Add order detail
 router.post("/addOrderDetail", async function (req, res) {

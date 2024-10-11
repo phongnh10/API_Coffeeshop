@@ -3,6 +3,7 @@ const router = express.Router();
 const orderModel = require("../models/order");
 const userModel = require("../models/user");
 const orderDetailModel = require("../models/orderDetail");
+const mongoose = require("mongoose");
 
 // add order
 router.post("/addOrder", async function (req, res) {

@@ -3,6 +3,7 @@ var router = express.Router();
 let favoriteModel = require("../models/favorite");
 let userModel = require("../models/user");
 let productModel = require("../models/product");
+const mongoose = require("mongoose");
 
 // Add favorite
 router.post("/addFavorite", async function (req, res) {
