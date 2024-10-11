@@ -20,8 +20,24 @@ router.get("/list", async function (req, res) {
   }
 });
 
+// by id
+router.get("/getProductByIdCategory/:idCategory", async function (req, res) {
+  try {
+    const { idCategory } = req.params;
+
+    const data = await productModel.find({ _id: idCategory });
+    if (!data || data.length === 0) {
+      return res.status(400).json({ status: false, message: "Thất Bại" });
+    }
+    res.json(data);
+  } catch (error) {
+    res.status(400).json({ status: false, message: "error" });
+  }
+});
+
 // add product
 router.post("/add", async function (req, res) {
+router.post("/addProduct", async function (req, res) {
   try {
     const {
       image,
@@ -70,6 +86,7 @@ router.post("/add", async function (req, res) {
 
   // deleta product
   router.delete("/delete", async function (req, res) {
+  router.delete("/deleteProduct", async function (req, res) {
     try {
       const { id } = req.body;
       const itemDelete = await productModel.findById(id);
