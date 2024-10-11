@@ -6,7 +6,7 @@ let sendMail = require("../utils/configMail");
 const { model } = require("mongoose");
 
 //  - Lấy toàn bộ danh sách sản phẩm
-router.get("/list", async function (req, res) {
+router.get("/getProducts", async function (req, res) {
   try {
     const data = await productModel.find();
     if (!data) {
@@ -36,7 +36,6 @@ router.get("/getProductByIdCategory/:idCategory", async function (req, res) {
 });
 
 // add product
-router.post("/add", async function (req, res) {
 router.post("/addProduct", async function (req, res) {
   try {
     const {
@@ -85,7 +84,6 @@ router.post("/addProduct", async function (req, res) {
   }
 
   // deleta product
-  router.delete("/delete", async function (req, res) {
   router.delete("/deleteProduct", async function (req, res) {
     try {
       const { id } = req.body;
