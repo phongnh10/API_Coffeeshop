@@ -3,7 +3,6 @@ var router = express.Router();
 let favoriteModel = require("../models/favorite");
 let userModel = require("../models/user");
 let productModel = require("../models/product");
-const mongoose = require("mongoose");
 
 // Add favorite
 router.post("/addFavorite", async function (req, res) {
@@ -46,17 +45,26 @@ router.post("/addFavorite", async function (req, res) {
 router.get("/getFavoritesByIdUser", async function (req, res) {
   try {
     const { idUser } = req.query;
-    const data = await favoriteModel.find({ user: idUser });
 
-    if (data.length === 0) {
-      return res
-        .status(400)
-        .json({ status: false, message: "Không có sản phẩm yêu thích nào" });
+    const favorites = await favoriteModel
+      .find({ user: idUser })
+      .populate("product");
+    if (favorites.length === 0) {
+      return res.status(400).json({
+        status: false,
+        message: "Không có sản phẩm yêu thích nào",
+      });
     }
 
-    res.status(200).json(data);
+    return res.status(200).json({
+      status: true,
+      favorites: favorites,
+    });
   } catch (error) {
-    res.status(400).json({ status: false, message: error.message || "error" });
+    res.status(400).json({
+      status: false,
+      message: error.message || "Đã có lỗi xảy ra",
+    });
   }
 });
 

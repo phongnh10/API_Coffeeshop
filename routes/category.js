@@ -3,17 +3,22 @@ const mongoose = require("mongoose");
 var router = express.Router();
 var categoeryModel = require("../models/category");
 
+// http://localhost:4000/category/getCategories
 //get
-router.get("/getCategories", async function name(req, res) {
+router.get("/", async function (req, res) {
   try {
-    let data = await categoeryModel.find();
-    res.status(200).json({ status: true, data });
+    const categories = await categoeryModel.find({}, "-__v");
+    if (!categories) {
+      return res
+        .status(400)
+        .json({ status: false, message: "Không tìm thấy thể loại" });
+    }
+    return res.status(200).json({ status: true, categories });
   } catch (error) {
     res.status(400).json({ status: false, message: error.message || "error" });
   }
 });
 
-//add
 router.post("/addCategory", async function (req, res, next) {
   try {
     const { name } = req.body;

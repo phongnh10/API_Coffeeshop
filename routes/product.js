@@ -3,18 +3,16 @@ const router = express.Router();
 let productModel = require("../models/product");
 let upload = require("../utils/configMulter");
 let sendMail = require("../utils/configMail");
-const { model } = require("mongoose");
 const mongoose = require("mongoose");
 
 //  - Lấy toàn bộ danh sách sản phẩm
-router.get("/getProducts", async function (req, res) {
+router.get("/", async function (req, res) {
   try {
-    const data = await productModel.find();
-    if (!data) {
-      res.status(400).json({ status: false, message: "Thất Bại" });
-      return;
+    const products = await productModel.find({}, "-__v");
+    if (!products) {
+      return res.status(400).json({ status: false, message: "Thất Bại" });
     } else {
-      res.status(true).json(data);
+      return res.status(200).json({ status: true, products });
     }
   } catch (error) {
     res.status(500).json({ status: false, message: "error" });
@@ -22,32 +20,81 @@ router.get("/getProducts", async function (req, res) {
 });
 
 // by id
-router.get("/getProductByIdCategory/:idCategory", async function (req, res) {
+router.get("/byCategory", async (req, res) => {
+  const categoryId = req.query.categoryId;
+  if (!categoryId) {
+    return res.status(400).json({
+      status: false,
+      message: "Không tìm thấy categoryId",
+    });
+  }
   try {
-    const { idCategory } = req.params;
-
-    // Chuyển đổi idCategory thành ObjectId
-    const categoryId = mongoose.Types.ObjectId(idCategory);
-
-    // Tìm kiếm sản phẩm theo category
-    const products = await productModel.find({ category: categoryId });
-
-    // Kiểm tra nếu không có sản phẩm nào được tìm thấy
-    if (!products || products.length === 0) {
-      return res
-        .status(404)
-        .json({ status: false, message: "Không tìm thấy sản phẩm nào." });
+    const products = await productModel.aggregate([
+      { $match: { category: categoryId } },
+    ]);
+    if (products.length == 0) {
+      return res.status(400).json({
+        status: false,
+        message: error.message,
+      });
     }
-
-    // Trả về danh sách sản phẩm
-    res.json({ status: true, data: products });
+    return res.status(200).json({
+      status: true,
+      products,
+    });
   } catch (error) {
-    console.error(error); // In ra lỗi để dễ dàng debug
-    res
-      .status(500)
-      .json({ status: false, message: "Có lỗi xảy ra", error: error.message });
+    res.status(400).json({
+      status: false,
+      message: error.message,
+    });
   }
 });
+
+// Get product by _idProduct
+router.get("/getproduct", async function (req, res) {
+  try {
+    const { idProduct } = req.query;
+    const product = await productModel.findById(idProduct);
+
+    if (!product) {
+      return res
+        .status(400)
+        .json({ status: false, message: "Product not found" });
+    }
+
+    return res.status(200).json({ status: true, product });
+  } catch (error) {
+    return res.status(400).json({ status: false, message: error.message });
+  }
+});
+
+//
+
+router.get("/getProductFavorite", async function (req, res) {
+  const { idUser } = req.query;
+  try {
+    const userId = new mongoose.Types.ObjectId(idUser);
+    const products = await productModel.aggregate([
+      { $match: { user: userId } },
+    ]);
+    if (products.length === 0) {
+      return res.status(404).json({
+        status: false,
+        message: "Không có sản phẩm yêu thích nào được tìm thấy",
+      });
+    }
+    return res.status(200).json({
+      status: true,
+      products,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: false,
+      message: error,
+    });
+  }
+});
+
 // add product
 router.post("/addProduct", async function (req, res) {
   try {

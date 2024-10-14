@@ -3,7 +3,6 @@ var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
-
 // mongoose
 const mongoose = require("mongoose");
 require("./models/user");
@@ -49,9 +48,7 @@ mongoose
 cron.schedule("*/10 * * * *", async () => {
   try {
     // Gọi đến một endpoint của server
-    await axios.get(
-      "https://api-coffeeshop.onrender.com/category/getCategories"
-    ); // Thay đổi đường dẫn endpoint phù hợp
+    await axios.get("https://api-coffeeshop.onrender.com/category"); // Thay đổi đường dẫn endpoint phù hợp
     console.log("Server đã được gọi thành công!");
   } catch (error) {
     console.error("Có lỗi xảy ra khi gọi server:", error.message);

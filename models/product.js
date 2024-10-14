@@ -12,7 +12,7 @@ const product = new Schema({
   rating: { type: Number },
   rating_quantity: { type: Number },
   price: { type: Number },
-  category: [{ type: ObjectId, ref: "category" }],
+  category: [{ type: ObjectId, ref: "category" }], // khoa ngoai
 });
 
 module.exports = mongoose.models.product || mongoose.model("product", product);

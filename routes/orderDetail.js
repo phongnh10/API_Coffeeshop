@@ -7,46 +7,52 @@ const orderModel = require("../models/order");
 const mongoose = require("mongoose");
 
 // Add order detail
-router.post("/addOrderDetail", async function (req, res) {
+router.post("/addOrderDetail", async (req, res) => {
   try {
-    const { quantity, totalPrice, idProduct, idUser, status = 0 } = req.body;
+    const { quantity, totalPrice, size, idProduct, idUser, order, status } =
+      req.body;
 
+    // Kiểm tra sự tồn tại của người dùng và sản phẩm
     const user = await userModel.findById(idUser);
     const product = await productModel.findById(idProduct);
 
     if (!user) {
       return res
-        .status(400)
+        .status(404)
         .json({ status: false, message: "Tài khoản không tồn tại" });
     }
-
     if (!product) {
       return res
-        .status(400)
+        .status(404)
         .json({ status: false, message: "Sản phẩm không tồn tại" });
     }
-
-    // Kiểm tra số lượng và tổng giá tiền
-    if (!quantity || !totalPrice || quantity <= 0 || totalPrice <= 0) {
-      return res.status(400).json({
-        status: false,
-        message: "Số lượng hoặc tổng tiền không hợp lệ",
-      });
+    if (!quantity || !totalPrice || !size || !idProduct || !idUser) {
+      return res
+        .status(404)
+        .json({ status: false, message: "Thiếu thông tin sản phẩm" });
     }
 
-    await orderDetailModel.create({
+    // Tạo chi tiết đơn hàng mới
+    const newOrderDetail = await orderDetailModel.create({
       quantity,
       totalPrice,
+      size,
       product: idProduct,
       user: idUser,
+      order: null,
       status,
     });
 
-    res
-      .status(200)
-      .json({ status: true, message: "Thêm chi tiết đơn hàng thành công" });
+    res.status(201).json({
+      status: true,
+      message: "Thêm chi tiết đơn hàng thành công",
+      data: newOrderDetail, // Trả lại chi tiết đơn hàng vừa thêm
+    });
   } catch (error) {
-    res.status(400).json({ status: false, message: error.message || "error" });
+    res.status(500).json({
+      status: false,
+      message: error.message || "Internal Server Error",
+    });
   }
 });
 
@@ -66,9 +72,9 @@ router.get("/getOrderDetailByIdUserAndStatus", async function (req, res) {
       });
     }
 
-    res.status(200).json(orderDetails);
+    res.status(200).json({ status: true, orderDetails: orderDetails });
   } catch (error) {
-    res.status(400).json({ status: false, message: error.message || "error" });
+    res.status(400).json({ status: false, message: "error" });
   }
 });
 
