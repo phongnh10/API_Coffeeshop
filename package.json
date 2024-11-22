@@ -9,6 +9,7 @@
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css}\""
   },
   "dependencies": {
+    "@payos/node": "^1.0.10",
     "axios": "^1.7.7",
     "cloudinary": "^2.5.1",
     "cookie-parser": "~1.4.4",
