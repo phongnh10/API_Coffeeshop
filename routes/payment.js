@@ -1,6 +1,6 @@
 const express = require("express");
 const PayOS = require("@payos/node");
-const Payment = require("./models/payment");
+const Payment = require("../models/payment");
 const router = express.Router();
 
 const payOS = new PayOS(

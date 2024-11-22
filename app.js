@@ -23,8 +23,7 @@ var categoryRouter = require("./routes/category");
 var favoriteRouter = require("./routes/favorite");
 var orderDetailRouter = require("./routes/orderDetail");
 var orderRouter = require("./routes/order");
-const paymentRouter = require("./models/payment");
-
+const paymentRouter = require("./routes/payment");
 // view engine setup
 var app = express();
 app.set("views", path.join(__dirname, "views"));
