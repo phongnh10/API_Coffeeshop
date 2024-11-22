@@ -1,17 +1,15 @@
 const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
-const ObjectId = Schema.ObjectId;
-const user = require("./user");
-const order = require("./order");
 
-const payment = new Schema({
-  id: { type: ObjectId },
-  quantity: { type: Number },
-  totalPrice: { type: Number },
-  date: { type: Date, default: Date.now },
-  user: { type: ObjectId, ref: "user" },
-  order: { type: ObjectId, ref: "order" },
-  status: { type: Number, default: 0 },
+const paymentSchema = new mongoose.Schema({
+  orderCode: { type: String, required: true },
+  amount: { type: Number, required: true },
+  description: { type: String, required: true },
+  status: {
+    type: String,
+    enum: ["PENDING", "SUCCESS", "FAILED"],
+    default: "PENDING",
+  },
+  createdAt: { type: Date, default: Date.now },
 });
 
-module.exports = mongoose.models.payment || mongoose.model("payment", payment);
+module.exports = mongoose.model("Payment", paymentSchema);

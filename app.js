@@ -21,10 +21,9 @@ var userRouter = require("./routes/user");
 var productRouter = require("./routes/product");
 var categoryRouter = require("./routes/category");
 var favoriteRouter = require("./routes/favorite");
-var orderDetailModel = require("./routes/orderDetail");
-var orderModel = require("./routes/order");
-var orderPayment = require("./routes/payment");
-const paymentModel = require("./models/payment");
+var orderDetailRouter = require("./routes/orderDetail");
+var orderRouter = require("./routes/order");
+const paymentRouter = require("./models/payment");
 
 // view engine setup
 var app = express();
@@ -60,9 +59,9 @@ app.use("/user", userRouter);
 app.use("/product", productRouter);
 app.use("/category", categoryRouter);
 app.use("/favorite", favoriteRouter);
-app.use("/orderDetail", orderDetailModel);
-app.use("/order", orderModel);
-app.use("/payment", paymentModel);
+app.use("/orderDetail", orderDetailRouter);
+app.use("/order", orderRouter);
+app.use("/payment", paymentRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
