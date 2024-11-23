@@ -11,10 +11,10 @@ const payOS = new PayOS(
 );
 
 router.post("/create-embedded-payment-link", async (req, res) => {
-  const { orderCode, amount, description, items, returnUrl, cancelUrl } =
+  const { orderCode, amount, description, signature, returnUrl, cancelUrl } =
     req.body;
 
-  if (!orderCode || !amount || !returnUrl || !cancelUrl) {
+  if (!orderCode || !amount || !signature || !returnUrl || !cancelUrl) {
     return res.status(400).send({
       message:
         "Missing required fields: orderCode, amount, returnUrl, cancelUrl",
@@ -25,7 +25,7 @@ router.post("/create-embedded-payment-link", async (req, res) => {
     orderCode,
     amount,
     description,
-    items,
+    signature,
     returnUrl,
     cancelUrl,
   };
