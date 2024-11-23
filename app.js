@@ -10,7 +10,6 @@ require("./models/category");
 require("./models/product");
 require("./models/orderDetail");
 require("./models/order");
-require("./models/payment");
 
 // axios và node-cron
 const axios = require("axios");
