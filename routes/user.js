@@ -45,7 +45,7 @@ router.post("/login", async function (req, res) {
       });
     }
   } catch (e) {
-    res.status(400).json({ status: false, message: "error" });
+    res.status(500).json({ status: false, message: "error" });
   }
 });
 //ForgotPassword
@@ -61,7 +61,7 @@ router.post("/forgotPassword", async function (req, res) {
         .json({ status: true, message: "Gửi mã xác thực thành công" });
     }
   } catch (error) {
-    res.status(400).json({ status: false, message: "error" });
+    res.status(500).json({ status: false, message: "error" });
   }
 });
 
@@ -76,7 +76,7 @@ router.get("/getIdUser", async function (req, res) {
     }
     res.status(200).json({ status: true, user });
   } catch (error) {
-    res.status(400).json({ status: false, message: error });
+    res.status(500).json({ status: false, message: error });
   }
 });
 module.exports = router;

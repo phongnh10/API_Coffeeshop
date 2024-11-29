@@ -1,58 +1,75 @@
 var express = require("express");
 const mongoose = require("mongoose");
 var router = express.Router();
-var categoeryModel = require("../models/category");
+var categoryModel = require("../models/category");
 
 // http://localhost:4000/category/getCategories
-//get
+// GET
 router.get("/", async function (req, res) {
   try {
-    const categories = await categoeryModel.find({}, "-__v");
-    if (!categories) {
+    const categories = await categoryModel.find({}, "-__v");
+    if (!categories || categories.length === 0) {
       return res
-        .status(400)
+        .status(404)
         .json({ status: false, message: "Không tìm thấy thể loại" });
     }
     return res.status(200).json({ status: true, categories });
   } catch (error) {
-    res.status(400).json({ status: false, message: error.message || "error" });
+    res
+      .status(500)
+      .json({ status: false, message: error.message || "Lỗi server" });
   }
 });
 
-router.post("/addCategory", async function (req, res, next) {
+// Add Category
+router.post("/addCategory", async function (req, res) {
   try {
     const { name } = req.body;
-    const addItem = { name };
-    if (!addItem) {
-      res
+
+    if (!name || name.trim() === "") {
+      return res
         .status(400)
-        .json({ status: false, message: "Thêm thể loại thất bại" });
-      return;
+        .json({ status: false, message: "Tên thể loại không được để trống" });
     }
-    await categoeryModel.create(addItem);
-    res.status(200).json({ satus: true, message: "Thêm thể loại thành công" });
-  } catch (e) {
-    res.status(400).json({ status: false, message: error.message || "error" });
+
+    const newCategory = new categoryModel({ name });
+    await newCategory.save();
+
+    res.status(200).json({ status: true, message: "Thêm thể loại thành công" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ status: false, message: error.message || "Lỗi server" });
   }
 });
 
-//update
-router.put("/updateCategory", async function (req, res, next) {
+// Update Category
+router.put("/updateCategory", async function (req, res) {
   try {
-    const { id, name } = req.body;
-    let itemUpdate = await categoeryModel.findById(id);
-    if (itemUpdate != null) {
-      itemUpdate.name = name ? name : itemUpdate.name;
-      itemUpdate.image = image ? image : itemUpdate.image;
-      await itemUpdate.save();
-      res
-        .status(200)
-        .json({ Status: true, message: "Sửa thể loại thành công" });
-    } else {
-      res.status(400).json({ status: false, message: "Sửa thể loại thất bại" });
+    const { id, name, image } = req.body;
+
+    if (!id) {
+      return res
+        .status(400)
+        .json({ status: false, message: "ID thể loại không hợp lệ" });
     }
+
+    let category = await categoryModel.findById(id);
+    if (!category) {
+      return res
+        .status(404)
+        .json({ status: false, message: "Thể loại không tồn tại" });
+    }
+
+    category.name = name ? name : category.name;
+    category.image = image ? image : category.image;
+
+    await category.save();
+    res.status(200).json({ status: true, message: "Sửa thể loại thành công" });
   } catch (error) {
-    res.status(400).json({ status: false, message: error.message || "error" });
+    res
+      .status(500)
+      .json({ status: false, message: error.message || "Lỗi server" });
   }
 });
 

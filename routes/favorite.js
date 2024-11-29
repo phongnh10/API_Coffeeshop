@@ -9,18 +9,33 @@ router.post("/addFavorite", async function (req, res) {
   try {
     const { idProduct, idUser } = req.body;
 
+    // Kiểm tra người dùng
+    if (!mongoose.Types.ObjectId.isValid(idUser)) {
+      return res
+        .status(400)
+        .json({ status: false, message: "ID người dùng không hợp lệ" });
+    }
     const isIdUser = await userModel.findById(idUser);
     if (!isIdUser) {
       return res
-        .status(400)
+        .status(404)
         .json({ status: false, message: "Người dùng không tồn tại" });
+    }
+
+    // Kiểm tra sản phẩm
+    if (!mongoose.Types.ObjectId.isValid(idProduct)) {
+      return res
+        .status(400)
+        .json({ status: false, message: "ID sản phẩm không hợp lệ" });
     }
     const addFavorite = await productModel.findById(idProduct);
     if (!addFavorite) {
       return res
-        .status(400)
+        .status(404)
         .json({ status: false, message: "Sản phẩm không tồn tại" });
     }
+
+    // Kiểm tra nếu sản phẩm đã có trong danh sách yêu thích
     const isFavorite = await favoriteModel.findOne({
       product: idProduct,
       user: idUser,
@@ -32,12 +47,15 @@ router.post("/addFavorite", async function (req, res) {
       });
     }
 
+    // Thêm sản phẩm vào danh sách yêu thích
     await favoriteModel.create({ product: idProduct, user: idUser });
     res
       .status(200)
       .json({ status: true, message: "Thêm sản phẩm yêu thích thành công" });
   } catch (error) {
-    res.status(400).json({ status: false, message: error.message || "error" });
+    res
+      .status(500)
+      .json({ status: false, message: error.message || "Lỗi server" });
   }
 });
 
@@ -46,11 +64,19 @@ router.get("/getFavoritesByIdUser", async function (req, res) {
   try {
     const { idUser } = req.query;
 
+    // Kiểm tra ID người dùng
+    if (!mongoose.Types.ObjectId.isValid(idUser)) {
+      return res
+        .status(400)
+        .json({ status: false, message: "ID người dùng không hợp lệ" });
+    }
+
     const favorites = await favoriteModel
       .find({ user: idUser })
       .populate("product");
+
     if (favorites.length === 0) {
-      return res.status(400).json({
+      return res.status(404).json({
         status: false,
         message: "Không có sản phẩm yêu thích nào",
       });
@@ -61,9 +87,9 @@ router.get("/getFavoritesByIdUser", async function (req, res) {
       favorites: favorites,
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(500).json({
       status: false,
-      message: error.message || "Đã có lỗi xảy ra",
+      message: error.message || "Lỗi server",
     });
   }
 });
@@ -72,11 +98,19 @@ router.get("/getFavoritesByIdUser", async function (req, res) {
 router.delete("/deleteFavorite/:idFavorite", async function (req, res) {
   try {
     const { idFavorite } = req.params;
+
+    // Kiểm tra ID yêu thích
+    if (!mongoose.Types.ObjectId.isValid(idFavorite)) {
+      return res
+        .status(400)
+        .json({ status: false, message: "ID yêu thích không hợp lệ" });
+    }
+
     const itemFavorite = await favoriteModel.findById(idFavorite);
 
     if (!itemFavorite) {
       return res
-        .status(400)
+        .status(404)
         .json({ status: false, message: "Không có sản phẩm yêu thích nào" });
     }
 
@@ -85,7 +119,9 @@ router.delete("/deleteFavorite/:idFavorite", async function (req, res) {
       .status(200)
       .json({ status: true, message: "Xoá sản phẩm yêu thích thành công" });
   } catch (error) {
-    res.status(400).json({ status: false, message: error.message || "error" });
+    res
+      .status(500)
+      .json({ status: false, message: error.message || "Lỗi server" });
   }
 });
 
