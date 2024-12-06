@@ -10,7 +10,6 @@ require("./models/category");
 require("./models/product");
 require("./models/orderDetail");
 require("./models/order");
-require("./models/payment");
 
 // axios và node-cron
 const axios = require("axios");
@@ -24,7 +23,6 @@ var favoriteRouter = require("./routes/favorite");
 var orderDetailModel = require("./routes/orderDetail");
 var orderModel = require("./routes/order");
 var orderPayment = require("./routes/payment");
-const paymentModel = require("./models/payment");
 
 // view engine setup
 var app = express();
@@ -62,7 +60,6 @@ app.use("/category", categoryRouter);
 app.use("/favorite", favoriteRouter);
 app.use("/orderDetail", orderDetailModel);
 app.use("/order", orderModel);
-app.use("/payment", paymentModel);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
